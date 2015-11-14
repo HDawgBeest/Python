@@ -1,0 +1,80 @@
+from tkinter import *
+import random
+import time
+import math
+def start():
+    master = Tk()
+    w = Canvas(master,width=1000,height=700,bg='black')
+    w.pack()
+    x=0
+    y=0
+    mouse=w.winfo_pointerxy()[0]
+    bricks1=[]
+    for i in range(21):
+        x=i*100
+        if x>=1000:
+            x=x-1000
+            if y==0:
+                y=y+40
+        w.create_rectangle(x,y,x+100,y+40,fill='blue',tags=i)
+        bricks1.append(w.coords(i))
+    check=[]
+    for i in range(21):
+        check.append(i)
+    y=40
+    xvel=((2*random.random())*(random.random()))*20
+    if xvel<5:
+        xvel=xvel*2
+    elif xvel>20:
+        xvel=xvel/2
+    yvel=20
+    original=20
+    move=50
+    score=0
+    lives=3
+    ball=w.create_oval(475,325,500,350,fill='red')
+    paddle=w.create_rectangle(mouse-50,650,mouse+50,675,fill='white')
+    w.create_text(50,690,fill='white',font=('Arial',24),text='Lives:')
+    lifetext=w.create_text(110,690,fill='white',font=('Arial',24),text=lives)
+    signature=w.create_text(850,685,fill='purple',font=('Arial',22),text="By HDawgBeest")
+    while lives>=0:
+        w.after(50)
+        w.update()
+        w.itemconfig(lifetext,text=lives)
+        mouse=w.winfo_pointerxy()[0]
+        w.move(ball,xvel,yvel)
+        w.coords(paddle,mouse-75,650,mouse+75,675)
+        if w.coords(ball)[2]>w.coords(paddle)[0] and w.coords(ball)[0]<w.coords(paddle)[2] and w.coords(ball)[1]<w.coords(paddle)[3] and w.coords(ball)[3]>w.coords(paddle)[1]:
+            if yvel<20 and yvel>0:
+                yvel=-20
+            else:
+                yvel=-(abs(yvel))
+                yvel=1.1*yvel
+                xvel=1.1*xvel
+        for i in range(1,21):
+            if w.coords(ball)[2]>(bricks1[i])[0] and w.coords(ball)[0]<(bricks1[i])[2] and w.coords(ball)[1]<(bricks1[i])[3] and w.coords(ball)[3]>(bricks1[i])[1]:
+                if check[i]==i:
+                    yvel=abs(yvel)
+                    w.itemconfig(i,fill='grey')
+                    check[i]=-1
+                    score=score+1
+        if w.coords(ball)[0]<0 or w.coords(ball)[2]>999:
+            xvel=-xvel
+        if w.coords(ball)[3]>699:
+            lives=lives-1
+            w.move(ball,-w.coords(ball)[0]+500,-w.coords(ball)[1]+250)
+            yvel=10
+            xvel=((2*random.random())*(random.random()))*20
+            if xvel<5:
+                xvel=xvel*2
+            elif xvel>20:
+                xvel=xvel/2
+        if w.coords(ball)[1]<0:
+            yvel=abs(yvel)
+        if score==20:
+            w.create_text(500,350,fill='light green',font=('Arial',36),text="You Win!")
+            break
+        if lives==0:
+            w.create_text(500,350,fill='red',font=('Arial',36),text="You Lose")
+            break
+start()
